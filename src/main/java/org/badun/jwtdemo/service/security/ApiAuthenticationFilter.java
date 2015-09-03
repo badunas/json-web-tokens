@@ -30,7 +30,6 @@ import java.util.Optional;
 public class ApiAuthenticationFilter implements Filter {
     private static final Log log = LogFactory.getLog(ApiAuthenticationFilter.class);
     private static final String DEFAULT_AUTH_TOKEN_HEADER = "X-Auth-Token";
-    private static final int DEFAULT_TOKEN_TTL_MINUTES = 60*24*30;
     private static final String AUTH_TOKEN_GENERATED_HEADER = "auth-token-Generated";
 
     @Autowired
@@ -106,7 +105,9 @@ public class ApiAuthenticationFilter implements Filter {
         if (!isUserAlreadyAuthenticated(authentication) && isTokenGenerationNeeded(request)) {
             return;
         }
-        String token = tokenProcessor.generateToken(collectClaims(authentication.getPrincipal()), DEFAULT_TOKEN_TTL_MINUTES);
+        String token = tokenProcessor.generateToken(
+                collectClaims(authentication.getPrincipal()),
+                TokenManager.DEFAULT_TOKEN_TTL_MINUTES);
         response.setHeader(DEFAULT_AUTH_TOKEN_HEADER, token);
         request.setAttribute(AUTH_TOKEN_GENERATED_HEADER, "");
     }

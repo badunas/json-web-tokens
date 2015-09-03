@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
  */
 public enum Claims {
     USER_NAME("uname"),
-    ROLE("role");
+    ROLE("role"),
+    TOKEN_ID("jti"),
+    EXPIRATION_DATE("exp");
 
     Claims(String val) {
         this.val = val;
