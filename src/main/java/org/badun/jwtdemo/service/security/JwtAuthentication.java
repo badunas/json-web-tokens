@@ -2,6 +2,8 @@ package org.badun.jwtdemo.service.security;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
@@ -10,13 +12,13 @@ import java.util.Collection;
  */
 public class JwtAuthentication extends AbstractAuthenticationToken {
     private String jwtToken;
-    private ExtendedUserDetails userDetails;
+    private UserDetails userDetails;
 
     public JwtAuthentication(String jwtToken) {
         this(jwtToken, null);
     }
 
-    public JwtAuthentication(String jwtToken, ExtendedUserDetails userDetails) {
+    public JwtAuthentication(String jwtToken, UserDetails userDetails) {
         super(null);
         this.jwtToken = jwtToken;
         this.userDetails = userDetails;
@@ -38,6 +40,6 @@ public class JwtAuthentication extends AbstractAuthenticationToken {
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return userDetails.getAuthorities();
+        return ((User) userDetails).getAuthorities();
     }
 }

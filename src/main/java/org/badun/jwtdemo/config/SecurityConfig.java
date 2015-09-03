@@ -2,6 +2,7 @@ package org.badun.jwtdemo.config;
 
 import org.badun.jwtdemo.service.security.ApiAuthenticationFilter;
 import org.badun.jwtdemo.service.security.JwtAuthenticationProvider;
+import org.badun.jwtdemo.service.security.jwt.Jose4JService;
 import org.badun.jwtdemo.service.security.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JwtService jwtService() {
-        return null;
+        return new Jose4JService(environment.getProperty(Env.JWT_SECRET.name()));
     }
 
     @Autowired

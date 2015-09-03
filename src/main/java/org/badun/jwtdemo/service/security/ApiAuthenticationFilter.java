@@ -68,7 +68,7 @@ public class ApiAuthenticationFilter implements Filter {
     }
 
     private void onTokenProvided(String token) {
-        if (authenticationIsNotRequired(token)) {
+        if (!isAuthenticationRequired(token)) {
             return;
         }
         Authentication authentication = authenticationManager.authenticate(new JwtAuthentication(token));
@@ -76,16 +76,17 @@ public class ApiAuthenticationFilter implements Filter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private boolean authenticationIsNotRequired(String token) {
+    private boolean isAuthenticationRequired(String token) {
         Authentication existingAuth = getExistingAuthentication();
-        if (isUserAlreadyAuthenticated(existingAuth)) return false;
-        if (existingAuth instanceof JwtAuthentication && !((JwtAuthentication) existingAuth).getJwtToken().equals(token)) {
-            return false;
+        if (!isUserAlreadyAuthenticated(existingAuth)) return true;
+        if (existingAuth instanceof JwtAuthentication
+                && !((JwtAuthentication) existingAuth).getJwtToken().equals(token)) {
+            return true;
         }
         if (existingAuth instanceof AnonymousAuthenticationToken) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private Authentication getExistingAuthentication() {
@@ -98,18 +99,16 @@ public class ApiAuthenticationFilter implements Filter {
 
     private void onTokenNotProvided(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = getExistingAuthentication();
-        if (isUserAlreadyAuthenticated(authentication)) {
-            return;
-        }
-        if (isNotTokenGenerationNeeded(request)) {
+        if (!isUserAlreadyAuthenticated(authentication) && isTokenGenerationNeeded(request)) {
             return;
         }
         String token = jwtService.generateToken((UserDetails) authentication.getPrincipal(), DEFAULT_TOKEN_TTL_MINUTES);
         response.setHeader(DEFAULT_AUTH_TOKEN_HEADER, token);
+        request.setAttribute(AUTH_TOKEN_GENERATED_HEADER, "");
     }
 
-    private boolean isNotTokenGenerationNeeded(HttpServletRequest request) {
-        return request.getAttribute(AUTH_TOKEN_GENERATED_HEADER) != null;
+    private boolean isTokenGenerationNeeded(HttpServletRequest request) {
+        return request.getAttribute(AUTH_TOKEN_GENERATED_HEADER) == null;
     }
 
     @Override

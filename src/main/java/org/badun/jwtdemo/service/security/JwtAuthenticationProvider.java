@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,9 +21,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = authentication.getCredentials().toString();
-        ExtendedUserDetails userDetails;
+        UserDetails userDetails;
         try {
-            userDetails = jwtService.parseToken(token);
+            userDetails = (UserDetails) jwtService.parseToken(token);
         } catch (JwtException e) {
             throw new InvalidTokenAuthenticationException("Authentication failed for token: " + token, e);
         }
