@@ -1,6 +1,6 @@
 package org.badun.jwtdemo.service.security;
 
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -8,16 +8,22 @@ import java.util.Collection;
 /**
  * Created by Artsiom Badun.
  */
-public class JwtAuthentication implements Authentication {
+public class JwtAuthentication extends AbstractAuthenticationToken {
     private String jwtToken;
+    private ExtendedUserDetails userDetails;
 
     public JwtAuthentication(String jwtToken) {
-        this.jwtToken = jwtToken;
+        this(jwtToken, null);
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public JwtAuthentication(String jwtToken, ExtendedUserDetails userDetails) {
+        super(null);
+        this.jwtToken = jwtToken;
+        this.userDetails = userDetails;
+    }
+
+    public String getJwtToken() {
+        return jwtToken;
     }
 
     @Override
@@ -26,27 +32,12 @@ public class JwtAuthentication implements Authentication {
     }
 
     @Override
-    public Object getDetails() {
-        return "JWT token provided.";
-    }
-
-    @Override
     public Object getPrincipal() {
-        return null;
+        return userDetails;
     }
 
     @Override
-    public boolean isAuthenticated() {
-        return false;
-    }
-
-    @Override
-    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
-    }
-
-    @Override
-    public String getName() {
-        return jwtToken;
+    public Collection<GrantedAuthority> getAuthorities() {
+        return userDetails.getAuthorities();
     }
 }
