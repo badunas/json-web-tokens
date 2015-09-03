@@ -1,9 +1,9 @@
 package org.badun.jwtdemo.config;
 
 import org.badun.jwtdemo.service.security.ApiAuthenticationFilter;
-import org.badun.jwtdemo.service.security.JwtAuthenticationProvider;
-import org.badun.jwtdemo.service.security.jwt.Jose4JService;
-import org.badun.jwtdemo.service.security.jwt.JwtService;
+import org.badun.jwtdemo.service.security.TokenAuthenticationProvider;
+import org.badun.jwtdemo.service.security.token.Jose4JProcessor;
+import org.badun.jwtdemo.service.security.token.TokenProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,14 +33,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtService jwtService() {
-        return new Jose4JService(environment.getProperty(Env.JWT_SECRET.name()));
+    public TokenProcessor jwtService() {
+        return new Jose4JProcessor(environment.getProperty(Env.JWT_SECRET.name()));
     }
 
     @Autowired
     private ApiAuthenticationFilter apiAuthenticationFilter;
     @Autowired
-    private JwtAuthenticationProvider apiAuthenticationProvider;
+    private TokenAuthenticationProvider apiAuthenticationProvider;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

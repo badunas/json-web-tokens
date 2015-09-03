@@ -10,27 +10,27 @@ import java.util.Collection;
 /**
  * Created by Artsiom Badun.
  */
-public class JwtAuthentication extends AbstractAuthenticationToken {
-    private String jwtToken;
+public class TokenAuthentication extends AbstractAuthenticationToken {
+    private String token;
     private UserDetails userDetails;
 
-    public JwtAuthentication(String jwtToken) {
-        this(jwtToken, null);
+    public TokenAuthentication(String token) {
+        this(token, null);
     }
 
-    public JwtAuthentication(String jwtToken, UserDetails userDetails) {
+    public TokenAuthentication(String token, UserDetails userDetails) {
         super(null);
-        this.jwtToken = jwtToken;
+        this.token = token;
         this.userDetails = userDetails;
     }
 
-    public String getJwtToken() {
-        return jwtToken;
+    public String getToken() {
+        return token;
     }
 
     @Override
     public Object getCredentials() {
-        return jwtToken;
+        return token;
     }
 
     @Override

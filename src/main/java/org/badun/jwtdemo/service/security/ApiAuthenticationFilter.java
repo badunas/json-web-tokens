@@ -2,7 +2,9 @@ package org.badun.jwtdemo.service.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.badun.jwtdemo.service.security.jwt.JwtService;
+import org.badun.jwtdemo.service.security.token.Claim;
+import org.badun.jwtdemo.service.security.token.Claims;
+import org.badun.jwtdemo.service.security.token.TokenProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +19,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -34,7 +38,7 @@ public class ApiAuthenticationFilter implements Filter {
     @Autowired
     private ApiAuthenticationEntryPoint entryPoint;
     @Autowired
-    private JwtService jwtService;
+    private TokenProcessor tokenProcessor;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -71,7 +75,7 @@ public class ApiAuthenticationFilter implements Filter {
         if (!isAuthenticationRequired(token)) {
             return;
         }
-        Authentication authentication = authenticationManager.authenticate(new JwtAuthentication(token));
+        Authentication authentication = authenticationManager.authenticate(new TokenAuthentication(token));
         log.debug("API user was authenticated: " + authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
@@ -79,8 +83,8 @@ public class ApiAuthenticationFilter implements Filter {
     private boolean isAuthenticationRequired(String token) {
         Authentication existingAuth = getExistingAuthentication();
         if (!isUserAlreadyAuthenticated(existingAuth)) return true;
-        if (existingAuth instanceof JwtAuthentication
-                && !((JwtAuthentication) existingAuth).getJwtToken().equals(token)) {
+        if (existingAuth instanceof TokenAuthentication
+                && !((TokenAuthentication) existingAuth).getToken().equals(token)) {
             return true;
         }
         if (existingAuth instanceof AnonymousAuthenticationToken) {
@@ -102,9 +106,17 @@ public class ApiAuthenticationFilter implements Filter {
         if (!isUserAlreadyAuthenticated(authentication) && isTokenGenerationNeeded(request)) {
             return;
         }
-        String token = jwtService.generateToken((UserDetails) authentication.getPrincipal(), DEFAULT_TOKEN_TTL_MINUTES);
+        String token = tokenProcessor.generateToken(collectClaims(authentication.getPrincipal()), DEFAULT_TOKEN_TTL_MINUTES);
         response.setHeader(DEFAULT_AUTH_TOKEN_HEADER, token);
         request.setAttribute(AUTH_TOKEN_GENERATED_HEADER, "");
+    }
+
+    private List<Claim> collectClaims(Object principal) {
+        UserDetails userDetails = (UserDetails) principal;
+        List<Claim> claims = new ArrayList<>();
+        claims.add(new Claim(Claims.USER_NAME, userDetails.getUsername()));
+        claims.add(new Claim(Claims.ROLE, userDetails.getAuthorities().iterator().next().getAuthority()));
+        return claims;
     }
 
     private boolean isTokenGenerationNeeded(HttpServletRequest request) {
