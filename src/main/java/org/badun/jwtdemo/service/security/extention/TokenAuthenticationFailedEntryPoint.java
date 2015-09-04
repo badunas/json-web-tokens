@@ -1,4 +1,4 @@
-package org.badun.jwtdemo.service.security;
+package org.badun.jwtdemo.service.security.extention;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -13,7 +13,7 @@ import java.io.IOException;
  * Created by Artsiom Badun.
  */
 @Component
-public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class TokenAuthenticationFailedEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,

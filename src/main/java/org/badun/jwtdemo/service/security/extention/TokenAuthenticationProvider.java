@@ -1,6 +1,7 @@
-package org.badun.jwtdemo.service.security;
+package org.badun.jwtdemo.service.security.extention;
 
-import org.badun.jwtdemo.service.security.token.Claim;
+import org.badun.jwtdemo.service.security.TokenManager;
+import org.badun.jwtdemo.service.security.token.ClaimName;
 import org.badun.jwtdemo.service.security.token.Claims;
 import org.badun.jwtdemo.service.security.token.TokenException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by Artsiom Badun.
@@ -27,7 +27,7 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = authentication.getCredentials().toString();
-        List<Claim> claims;
+        Claims claims;
         try {
             claims = tokenManager.verifyToken(token);
         } catch (TokenException e) {
@@ -37,16 +37,9 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         return new TokenAuthentication(token, userDetails);
     }
 
-    private UserDetails buildUserDetails(List<Claim> claims) {
-        String username = null;
-        String role = null;
-        for (Claim claim : claims) {
-            if (claim.name() == Claims.USER_NAME) {
-                username = claim.getValue();
-            } else if (claim.name() == Claims.ROLE) {
-                role = claim.getValue();
-            }
-        }
+    private UserDetails buildUserDetails(Claims claims) {
+        String username = claims.getValue(ClaimName.USER_NAME);
+        String role = claims.getValue(ClaimName.ROLE);
         return new User(
                 username,
                 "[PROTECTED]",

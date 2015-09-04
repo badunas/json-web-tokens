@@ -1,7 +1,8 @@
 package org.badun.jwtdemo.config;
 
-import org.badun.jwtdemo.service.security.ApiAuthenticationFilter;
-import org.badun.jwtdemo.service.security.TokenAuthenticationProvider;
+import org.badun.jwtdemo.service.security.filter.TokenAuthenticationFilter;
+import org.badun.jwtdemo.service.security.extention.TokenAuthenticationProvider;
+import org.badun.jwtdemo.service.security.filter.TokenGeneratorFilter;
 import org.badun.jwtdemo.service.security.token.Jose4JProcessor;
 import org.badun.jwtdemo.service.security.token.TokenProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Autowired
-    private ApiAuthenticationFilter apiAuthenticationFilter;
+    private TokenAuthenticationFilter tokenAuthenticationFilter;
+    @Autowired
+    private TokenGeneratorFilter tokenGeneratorFilter;
     @Autowired
     private TokenAuthenticationProvider apiAuthenticationProvider;
 
@@ -52,7 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .anonymous().disable()
                     .httpBasic()
                 .and()
-                    .addFilterAfter(apiAuthenticationFilter, BasicAuthenticationFilter.class)
+                    .addFilterAfter(tokenAuthenticationFilter, BasicAuthenticationFilter.class)
+                    .addFilterAfter(tokenGeneratorFilter, TokenAuthenticationFilter.class)
                     .authenticationProvider(apiAuthenticationProvider)
                     .sessionManagement()
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

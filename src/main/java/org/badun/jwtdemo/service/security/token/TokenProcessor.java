@@ -7,7 +7,7 @@ import java.util.List;
  */
 public interface TokenProcessor {
 
-    String generateToken(List<Claim> claims, int ttlMinutes);
+    String generateToken(Claims claims, int ttlMinutes);
 
-    List<Claim> parseToken(String token);
+    Claims parseToken(String token);
 }

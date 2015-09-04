@@ -1,4 +1,4 @@
-package org.badun.jwtdemo.service.security;
+package org.badun.jwtdemo.service.security.extention;
 
 
 import org.springframework.security.core.AuthenticationException;

@@ -4,10 +4,10 @@ package org.badun.jwtdemo.service.security.token;
  * Created by Artsiom Badun.
  */
 public class Claim {
-    private final Claims name;
+    private final ClaimName name;
     private final String value;
 
-    public Claim(Claims name, String value) {
+    public Claim(ClaimName name, String value) {
         this.name = name;
         this.value = value;
     }
@@ -16,7 +16,7 @@ public class Claim {
         return name.val();
     }
 
-    public Claims name() {
+    public ClaimName name() {
         return name;
     }
 

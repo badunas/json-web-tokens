@@ -1,32 +1,37 @@
 package org.badun.jwtdemo.service.security.token;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Artsiom Badun.
  */
-public enum Claims {
-    USER_NAME("uname"),
-    ROLE("role"),
-    TOKEN_ID("jti"),
-    EXPIRATION_DATE("exp");
+public class Claims {
+    private final List<Claim> claimList;
 
-    Claims(String val) {
-        this.val = val;
+    public Claims(List<Claim> claims) {
+        this.claimList = claims;
     }
 
-    private String val;
-
-    public String val() {
-        return val;
+    public List<Claim> getClaims() {
+        return claimList;
     }
 
-    private static Map<String, Claims> vals = Arrays.stream(values())
-            .collect(Collectors.toMap(Claims::val, value -> value));
+    public List<Claim> getClaimsExcept(ClaimName claimName) {
+        return claimList;
+    }
 
-    public static Claims get(String name) {
-        return vals.get(name);
+    public String getValue(ClaimName claimName) {
+        Optional<Claim> first = claimList.stream()
+                .filter(claim -> claim.name() == claimName)
+                .findFirst();
+        if (first.isPresent()) {
+            return first.get().getValue();
+        }
+        throw new ClaimException("Claim is not presented: " + claimName.val());
+    }
+
+    public Claim get(int index) {
+        return claimList.get(index);
     }
 }

@@ -25,7 +25,7 @@ public class Jose4JProcessor implements TokenProcessor {
     }
 
     @Override
-    public String generateToken(List<Claim> claims, int ttlMinutes) {
+    public String generateToken(Claims claims, int ttlMinutes) {
         try {
             JwtClaims jwtClaims = buildJwtClaims(claims, ttlMinutes);
             JsonWebSignature jws = buildJws(jwtClaims);
@@ -35,10 +35,10 @@ public class Jose4JProcessor implements TokenProcessor {
         }
     }
 
-    private JwtClaims buildJwtClaims(List<Claim> claims, int ttlMinutes) {
+    private JwtClaims buildJwtClaims(Claims claims, int ttlMinutes) {
         JwtClaims jwtClaims = getDefaultClaims();
         jwtClaims.setExpirationTimeMinutesInTheFuture(ttlMinutes);
-        for (Claim claim : claims) {
+        for (Claim claim : claims.getClaimsExcept(ClaimName.TOKEN_ID)) {
             jwtClaims.setClaim(claim.getName(), claim.getValue());
         }
         return jwtClaims;
@@ -63,7 +63,7 @@ public class Jose4JProcessor implements TokenProcessor {
     }
 
     @Override
-    public List<Claim> parseToken(String token) {
+    public Claims parseToken(String token) {
         try {
             JwtConsumer jwtConsumer = buildJwtConsumer();
             JwtClaims jwtClaims = fetchJwtClaims(jwtConsumer, token);
@@ -77,15 +77,15 @@ public class Jose4JProcessor implements TokenProcessor {
         return jwtConsumer.processToClaims(token);
     }
 
-    private List<Claim> collectClaims(JwtClaims jwtClaims) {
-        List<Claim> result = new ArrayList<>();
+    private Claims collectClaims(JwtClaims jwtClaims) {
+        List<Claim> climeList = new ArrayList<>();
         jwtClaims.getClaimsMap().forEach((name, value) -> {
-            Claims claimName = Claims.get(name);
+            ClaimName claimName = ClaimName.get(name);
             if (claimName != null) {
-                result.add(new Claim(claimName, value.toString()));
+                climeList.add(new Claim(claimName, value.toString()));
             }
         });
-        return result;
+        return new Claims(climeList);
     }
 
     private JwtConsumer buildJwtConsumer() {
