@@ -22,11 +22,6 @@ public class ApiController {
     @Autowired
     private TokenManager tokenManager;
 
-    @RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
-    public HeartBeatModel heartBeat() {
-        return new HeartBeatModel();
-    }
-
     @RequestMapping(value = "/token/refresh")
     public String refreshToken(@RequestHeader(BaseTokenFilter.DEFAULT_AUTH_TOKEN_HEADER) String token,
                                HttpServletResponse response) {
